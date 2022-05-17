@@ -54,13 +54,51 @@ def transformation_matrix_2d(delta_x = 0, delta_y = 0):
     return np.array(homogeneous_transformation_matrix)
 
 def rotation_matrix_2d(theta = 0): #theta is in radians
-    np.cos()
+    homogeneous_rotation_matrix = [
+        [np.cos(theta), -np.sin(theta), 0],
+        [np.sin(theta), np.cos(theta), 0],
+        [0, 0, 1]
+    ]
+    return np.array(homogeneous_rotation_matrix)
+
+def scale_matrix_2d(scale_x = 1, scale_y = 1):
+    homogeneous_scale_matrix = [
+        [scale_x, 0, 0],
+        [0, scale_y, 0],
+        [0, 0, 1]
+    ]
+    return np.array(homogeneous_scale_matrix)
+
+def shear_matrix_2d(h_x=1, h_y=1):
+    homogeneous_shear_matrix = [
+        [1, h_x, 0],
+        [h_y, 1, 0],
+        [0, 0, 1]
+    ]
+    return np.array(homogeneous_shear_matrix)
+
+def inverse_matrix(m):
+    return np.linagl.inv(m)
+
+class BarrelDistortionObject:
+    def __init__(self):
+
+    (pixels_x=3000, pixels_y=2000, )
 
 
 if __name__=="__main__":
     # filter()
-    adaptive_threshold()
+    # adaptive_threshold()
     # values = [255, 8, 8, 64, 128, 64, 16, 128, 64, 8, 32, 32, 128, 64, 128, 255]
     # values.sort()
     # print(values)
+    # print(np.dot(transformation_matrix_2d(3,2),rotation_matrix_2d(np.pi/4)))
+    # m = np.dot(scale_matrix_2d(2, 10),np.dot(transformation_matrix_2d(9, -3), rotation_matrix_2d(np.pi / 6)))
+    # print(m)
+    # print(np.dot(m,np.transpose(np.array([1,1,1]))))
+
+    m = np.dot(transformation_matrix_2d(8, 2), rotation_matrix_2d(np.pi / 6))
+    # print(np.linalg.det(m))
+    print(np.linalg.inv(m))
+
 
