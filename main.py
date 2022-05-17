@@ -81,9 +81,22 @@ def inverse_matrix(m):
     return np.linagl.inv(m)
 
 class BarrelDistortionObject:
-    def __init__(self):
+    def __init__(self, pixels_x=3000, pixels_y=2000, sensor_width=6.0, sensor_height=4.5):
+        self.sensor_width_px = pixels_x
+        self.sensor_height_px = pixels_y
+        self.sensor_width_mm = sensor_width
+        self.sensor_height_mm = sensor_height
+        self.pixel_width = sensor_width/pixels_x
+        self.pixel_height = sensor_height/pixels_y
+        print(f"pixel width: {self.pixel_width}, pixel height: {self.pixel_height}")
 
-    (pixels_x=3000, pixels_y=2000, )
+
+    def calculate_k1_in_mm(self):
+        # p**2 = xd**2 + yd**2
+        # xu = xd * (1 + k1 * p**2)
+        # xu / xd = 1 + k1 * p**2
+        # xu / xd -1 = k1 * p**2
+        pass
 
 
 if __name__=="__main__":
@@ -100,5 +113,7 @@ if __name__=="__main__":
     m = np.dot(transformation_matrix_2d(8, 2), rotation_matrix_2d(np.pi / 6))
     # print(np.linalg.det(m))
     print(np.linalg.inv(m))
+
+    test = BarrelDistortionObject()
 
 
