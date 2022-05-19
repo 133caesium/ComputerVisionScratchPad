@@ -81,7 +81,7 @@ def inverse_matrix(m):
     return np.linagl.inv(m)
 
 class BarrelDistortionObject:
-    def __init__(self, pixels_x=3000, pixels_y=2000, sensor_width=6.0, sensor_height=4.5):
+    def __init__(self, pixels_x=3000, pixels_y=2250, sensor_width=6.0, sensor_height=4.5):
         self.sensor_width_px = pixels_x
         self.sensor_height_px = pixels_y
         self.sensor_width_mm = sensor_width
@@ -96,7 +96,55 @@ class BarrelDistortionObject:
         # xu = xd * (1 + k1 * p**2)
         # xu / xd = 1 + k1 * p**2
         # xu / xd -1 = k1 * p**2
+        # (xu / xd -1) / p**2 = k1
+        # k1 = (xu/xd -1)/p**2
+        # k1 = (xu/xd -1)/(xd**2+yd**2)
+        xu = self.sensor_width_mm/2
+        xd = xu + self.pixel_width
+        yd = self.sensor_height_mm/2-self.pixel_width
+        k1 = (xu/xd -1)/(xd**2+yd**2)
+        return k1
+
+    def calculate_something(self):
         pass
+
+def compute_xuyu_given_xdyd(xd_px, yd_px, k1_um):
+    pixels_wide = 5000
+    pixels_high = 3750
+    sensor_wide = 5.0
+    sensor_high = 3.75
+    pixel_width = sensor_wide/pixels_wide
+    xd = (xd_px-pixels_wide/2)*pixel_width
+    yd = (yd_px - pixels_high / 2) * pixel_width
+
+    # k1 = (xu/xd -1)/(xd**2+yd**2)
+    k1 = k1_um * 0.001
+    p2 = ((xd/2))**2 + ((yd/2))**2
+    xu = xd * (1 + k1 * p2) / pixel_width + pixels_wide/2
+    yu = yd * (1 + k1 * p2) / pixel_width + pixels_high / 2
+    return xu, yu
+
+def compute_xuyu_given_xdyd_2(xd_px, yd_px, k1_um):
+    pixels_wide = 3000
+    pixels_high = 2250
+    sensor_wide = 6.0
+    sensor_high = 4.5
+
+    pixel_width = sensor_wide / pixels_wide
+    xd = (xd_px - pixels_wide / 2) * pixel_width
+    yd = (yd_px - pixels_high / 2) * pixel_width
+
+    k1 = k1_um * 0.001
+    p2 = ((xd/2))**2 + ((yd/2))**2
+    xu = xd * (1 + k1 * p2) / pixel_width + pixels_wide / 2
+    yu = yd * (1 + k1 * p2) / pixel_width + pixels_high / 2
+    return xu, yu
+
+def compute_k1i(Xd, Xu, Yd, Yu):
+    delta_i = np.sqrt((Xd-Xu)**2+(Yd-Yu)**2)
+    p_i = np.sqrt(Xd**2+Yd**2)
+    k1i = delta_i / p_i**3
+    return k1i
 
 
 if __name__=="__main__":
@@ -115,5 +163,14 @@ if __name__=="__main__":
     print(np.linalg.inv(m))
 
     test = BarrelDistortionObject()
+    print(test.calculate_k1_in_mm())
+    print(f'compute_xuyu_given_xdyd(3571, 685, -1.2) = {compute_xuyu_given_xdyd(3571, 685, -1.2)}')
+    print(f'compute_xuyu_given_xdyd(5000, 0, -1.2) = {compute_xuyu_given_xdyd(5000, 0, -1.2)}')
+    print(f'compute_xuyu_given_xdyd_2(x, 0, -1.2) = {compute_xuyu_given_xdyd_2(3000, 0, -0.44)}')
+    print(f'Using slide 10 lecture content k1 = {compute_k1i(6.5/2,6.5/2+0.002,4.5/2, 4.5/2+0.002)}')
 
-
+    xd = 2351-1500
+    xu = xd-1
+    yd = 1155-1125
+    k1 = (xu / xd - 1) / (xd ** 2 + yd ** 2)
+    print(k1)
